@@ -14,8 +14,12 @@ function onEventInput(e) {
   e.preventDefault();
   const searchText = e.target.value.trim();
 
+  if (searchText === '') {
+    return clearCountries();
+  }
+
   fetchCountries(searchText)
-    .then(renderCountriesCard)
+    .then(renderCountries)
     .catch(error => {
       Notify.failure('Oops, there is no country with that name');
       console.log('catch сработал');
@@ -23,8 +27,9 @@ function onEventInput(e) {
     });
 }
 
-function renderCountriesCard(countries) {
+function renderCountries(countries) {
   if (countries.length > 10) {
+    clearCountries();
     return Notify.info(
       'Too many matches found. Please enter a more specific name.'
     );
@@ -33,23 +38,29 @@ function renderCountriesCard(countries) {
     .map(({ name, capital, population, flags, languages }) => {
       if (countries.length === 1) {
         return `<li class="item">
+        <div class="flags-countries">
         <img src="${
-          flags.png
-        }" alt="flag of ${name}" width="20" height="15"></img>
+          flags.svg
+        }" alt="flag of ${name}" width="32" height="32"></img>
         <h1>${name}</h1>
+        </div>
         <p>Capital: ${capital}</p>
         <p>Population: ${population}</p>
-        <p>Languages: ${languages.map(({ name }) => name)}</p>
+        <p>Languages: ${languages.map(({ name }) => name).join(', ')}</p>
         </li>`;
       } else {
         return `<li class="item">
-        <img src="${flags.png}" alt="flag of ${name}" width="20" height="15"></img><h2>${name}</h2>
+        <div class="flags-countries">
+        <img src="${flags.svg}" alt="flag of ${name}" width="32" height="32"></img>
+        <h1>${name}</h1>
+        </div>
         </li>`;
       }
     })
     .join('');
   refs.list.innerHTML = markup;
 }
-{
-  /* <svg><use href="${flags.svg}"></use></svg> */
+
+function clearCountries() {
+  refs.list.innerHTML = '';
 }
